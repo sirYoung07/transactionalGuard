@@ -19,3 +19,14 @@ spring:
 logging:
     file:
         name: loggers.log
+    level:
+      root: info
+
+monnify:
+    apiKey: MK_TEST_X4YMHGLYAK
+    secretKey: W39PR966TRVS3HZ403Q72J9GFC3THQ4J
+    contractCode: 3955607117
+    uri: https://sandbox.monnify.com
+
+
+

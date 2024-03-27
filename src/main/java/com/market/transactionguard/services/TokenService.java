@@ -20,7 +20,7 @@ public class TokenService {
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    public String generateJwt(Authentication auth){
+    public String generateJwt(Authentication auth, String userEmail){
 
         Instant now = Instant.now();
 
@@ -28,10 +28,11 @@ public class TokenService {
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(" "));
 
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer("self")
             .issuedAt(now)
-            .subject(auth.getName())
+            .subject(userEmail)
             .claim("roles", scope)
             .build();
 

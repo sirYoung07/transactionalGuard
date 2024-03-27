@@ -11,8 +11,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -29,6 +27,7 @@ public class User implements UserDetails {
 
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long Id;
 
     @NotNull(message = "firstName filed is required")
@@ -41,6 +40,8 @@ public class User implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+
     @Column(name = "username", nullable = false)
     private String userName;
 
@@ -61,6 +62,7 @@ public class User implements UserDetails {
 
     public boolean isEnabled;
 
+
     @ManyToMany(fetch =FetchType.EAGER)
     @JoinTable(
         name = "user_role_junction",
@@ -69,6 +71,12 @@ public class User implements UserDetails {
 
     )
     private Set<Role> roles = new HashSet<>();
+
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Account account;
+
+
 
     public User(){
         super();
@@ -126,6 +134,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
 
 

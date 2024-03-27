@@ -1,18 +1,15 @@
 package com.market.transactionguard.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
-@Data
-public class SignUpResponse {
-
-    private String message;
-
-
+@NoArgsConstructor
+public class ErrorResponse {
+    private  String message;
+    private  int statusCode;
 }

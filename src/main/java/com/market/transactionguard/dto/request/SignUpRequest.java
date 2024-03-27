@@ -36,4 +36,6 @@ public class SignUpRequest {
     @NotNull(message = "password filed is required")
     @NotBlank(message = "password field cannot be blank")
     private String password;
+
+
 }

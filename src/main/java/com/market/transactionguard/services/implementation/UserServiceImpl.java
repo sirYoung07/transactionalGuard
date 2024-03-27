@@ -1,8 +1,10 @@
-package com.market.transactionguard.services;
+package com.market.transactionguard.services.implementation;
 
 import com.market.transactionguard.entities.User;
 import com.market.transactionguard.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,12 +21,8 @@ public class UserServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("in user service details");
         return userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("invalid user"));
     }
 
-    public Optional<User> getUserByUserId(Long userId){
-        return  userRepository.findById(userId);
-    }
 
 }
