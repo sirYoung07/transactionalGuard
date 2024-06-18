@@ -73,11 +73,12 @@ public class SecurityConfig {
                     "/swagger-ui.html"
                 ).permitAll();
 
-                auth.requestMatchers("/admin/**").hasRole("SELLER");
-                auth.requestMatchers("/user/**").hasAnyRole("SELLER", "BUYER");
+                //auth.requestMatchers("/admin/**").hasRole("SELLER");
+                //auth.requestMatchers("/user/**").hasAnyRole("SELLER", "BUYER");
 
 
-                auth.anyRequest().authenticated();
+                //auth.anyRequest().authenticated();
+                auth.anyRequest().permitAll();
 
             });
 

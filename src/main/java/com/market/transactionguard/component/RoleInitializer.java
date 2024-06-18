@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleInitializer implements CommandLineRunner {
+public class  RoleInitializer implements CommandLineRunner {
     @Autowired
     private RoleRepository roleRepository;
 

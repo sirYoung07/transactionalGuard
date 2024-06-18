@@ -2,8 +2,8 @@ package com.market.transactionguard.services.implementation;
 
 import com.market.transactionguard.config.MonnifyWebClientConfig;
 import com.market.transactionguard.dto.request.*;
+import com.market.transactionguard.dto.request.AccountCreationRequest;
 import com.market.transactionguard.dto.response.AccessTokenResponse;
-import com.market.transactionguard.dto.response.ErrorResponse;
 import com.market.transactionguard.dto.response.MonnifyReservedAccountResponse;
 import com.market.transactionguard.entities.Account;
 import com.market.transactionguard.entities.AccountDetails;
@@ -16,6 +16,7 @@ import com.market.transactionguard.utils.Base64Format;
 import com.market.transactionguard.utils.AccountUtil;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import org.aspectj.weaver.ast.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +27,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -140,12 +139,14 @@ public class AccountServiceImpl implements AccountService {
                    //set relationship between user and account
                    account.setUser(authenticatedUser.get());
 
-                    // set relationship between account and account     details
+                    // set relationship between account and account details
                    account.setAccountDetails(accountDetailsList);
 
                    accountRepository.save(account);
 
                    return ResponseEntity.ok(response);
+
+                   // TODO : EMAIL NOTIFICATION
 
                }else {
                    throw new RuntimeException("Failed to create a reserved account: " +
@@ -164,6 +165,17 @@ public class AccountServiceImpl implements AccountService {
        }
    }
 
+
+
+    @Override
+    public ResponseEntity<List<Account>> getUserReservedAccounts() {
+        List<Account>  accounts = accountRepository.findAll();
+         logger.info(String.valueOf(accounts));
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
+
+        // TODO:PAGINATION
+
+    }
 
 
     public String getAccessTokenFromMonnify() {

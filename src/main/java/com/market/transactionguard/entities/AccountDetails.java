@@ -1,14 +1,22 @@
 package com.market.transactionguard.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "account_details")
-public class AccountDetails {
+public class AccountDetails implements Serializable
+{
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_detail_id")
@@ -27,7 +35,21 @@ public class AccountDetails {
     private String accountName;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
+
+
+//    @Override
+//    public String toString() {
+//        return "AccountDetails{" +
+//            "accountDetailsId=" + accountDetailsId +
+//            ", bankCode='" + bankCode + '\'' +
+//            ", bankName='" + bankName + '\'' +
+//            ", accountNumber='" + accountNumber + '\'' +
+//            ", accountName='" + accountName + '\'' +
+//            ", account=" + account +
+//            '}';
+//    }
 }

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 @ControllerAdvice
 public class GlobalException {
+
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
