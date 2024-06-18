@@ -19,6 +19,15 @@ spring:
             enabled: always
 
 
+    servlet:
+      multipart:
+        enabled: true
+        file-size-threshold: 2KB
+        max-file-size: 200MB
+        max-request-size: 200MB
+
+
+
 logging:
     file:
         name: loggers.log

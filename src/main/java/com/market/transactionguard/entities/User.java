@@ -1,10 +1,8 @@
 package com.market.transactionguard.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import io.swagger.v3.core.util.Json;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,11 +12,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -31,8 +29,8 @@ import java.util.Set;
 @Entity
 public class User implements UserDetails , Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    //  @Serial
+    //private static final long serialVersionUID = 1L;
 
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +52,7 @@ public class User implements UserDetails , Serializable {
     @Column(name = "username", nullable = false)
     private String userName;
 
-    @Column( nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @CreationTimestamp
@@ -72,7 +70,7 @@ public class User implements UserDetails , Serializable {
     public boolean isEnabled;
 
 
-    @ManyToMany(fetch =FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role_junction",
         joinColumns = {@JoinColumn(name = "user_id")},
@@ -86,11 +84,14 @@ public class User implements UserDetails , Serializable {
     @JsonManagedReference
     private Account account;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Transaction> transactions;
 
 
-    public User(){
+    public User() {
         super();
-        this.roles = new HashSet<Role>();
+        this.roles = new HashSet<>();
 
     }
 
@@ -146,25 +147,4 @@ public class User implements UserDetails , Serializable {
     }
 
 
-//    @Override
-//    public String toString() {
-//        return "User{" +
-//            "Id=" + Id +
-//            ", firstName='" + firstName + '\'' +
-//            ", lastName='" + lastName + '\'' +
-//            ", email='" + email + '\'' +
-//            ", userName='" + userName + '\'' +
-//            ", password='" + password + '\'' +
-//            ", createdAt=" + createdAt +
-//            ", updatedAt=" + updatedAt +
-//            ", isAccountNonExpired=" + isAccountNonExpired +
-//            ", isAccountNonLocked=" + isAccountNonLocked +
-//            ", isCredentialsNonExpired=" + isCredentialsNonExpired +
-//            ", isEnabled=" + isEnabled +
-//            ", roles=" + roles +
-//            ", account=" + account +
-//            '}';
-//    }
 }
-
-

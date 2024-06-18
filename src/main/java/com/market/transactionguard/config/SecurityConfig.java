@@ -77,8 +77,8 @@ public class SecurityConfig {
                 //auth.requestMatchers("/user/**").hasAnyRole("SELLER", "BUYER");
 
 
-                //auth.anyRequest().authenticated();
-                auth.anyRequest().permitAll();
+                auth.anyRequest().authenticated();
+                //auth.anyRequest().permitAll();
 
             });
 

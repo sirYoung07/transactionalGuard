@@ -1,13 +1,10 @@
 package com.market.transactionguard.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,15 +12,15 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "account")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    //@Serial
+   // private static final long serialVersionUID = 1L;
 
 
     @Id
@@ -46,6 +43,5 @@ public class Account implements Serializable {
     @JsonManagedReference
     @OneToMany(mappedBy = "account",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AccountDetails> accountDetails;
-
 
 }
