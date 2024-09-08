@@ -1371,3 +1371,30 @@ Caused by: java.lang.ClassNotFoundException: com.market.transactionguard.entitie
 2024-09-08T21:30:11.301Z  INFO 10924 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8000 (http) with context path ''
 2024-09-08T21:30:11.305Z  INFO 10924 --- [restartedMain] c.m.t.TransactionguardApplication        : Started TransactionguardApplication in 1.206 seconds (process running for 3006.07)
 2024-09-08T21:30:11.332Z  INFO 10924 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2024-09-08T21:32:40.913Z  INFO 10924 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 1 deletion, 0 modifications)
+2024-09-08T21:32:40.923Z  INFO 10924 --- [Thread-75] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-09-08T21:32:40.924Z  INFO 10924 --- [Thread-75] com.zaxxer.hikari.HikariDataSource       : HikariPool-17 - Shutdown initiated...
+2024-09-08T21:32:40.935Z  INFO 10924 --- [Thread-75] com.zaxxer.hikari.HikariDataSource       : HikariPool-17 - Shutdown completed.
+2024-09-08T21:32:41.202Z  INFO 10924 --- [restartedMain] c.m.t.TransactionguardApplication        : Starting TransactionguardApplication using Java 17.0.8 with PID 10924 (/home/siryoung/Projects/transactionguard/target/classes started by siryoung in /home/siryoung/Projects/transactionguard)
+2024-09-08T21:32:41.202Z  INFO 10924 --- [restartedMain] c.m.t.TransactionguardApplication        : No active profile set, falling back to 1 default profile: "default"
+2024-09-08T21:32:41.418Z  INFO 10924 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-09-08T21:32:41.433Z  INFO 10924 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 14 ms. Found 6 JPA repository interfaces.
+2024-09-08T21:32:41.570Z  INFO 10924 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8000 (http)
+2024-09-08T21:32:41.571Z  INFO 10924 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-09-08T21:32:41.571Z  INFO 10924 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.18]
+2024-09-08T21:32:41.587Z  INFO 10924 --- [restartedMain] o.a.c.c.C.[Tomcat-4].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2024-09-08T21:32:41.588Z  INFO 10924 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 380 ms
+2024-09-08T21:32:41.636Z  INFO 10924 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-09-08T21:32:41.641Z  INFO 10924 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-09-08T21:32:41.644Z  INFO 10924 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-09-08T21:32:41.647Z  INFO 10924 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-18 - Starting...
+2024-09-08T21:32:41.672Z  INFO 10924 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-18 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6b8d1f56
+2024-09-08T21:32:41.672Z  INFO 10924 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-18 - Start completed.
+2024-09-08T21:32:41.839Z  INFO 10924 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-09-08T21:32:41.945Z  INFO 10924 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-09-08T21:32:42.414Z  WARN 10924 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-09-08T21:32:42.515Z  INFO 10924 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@33b44e33, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7d4a723, org.springframework.security.web.context.SecurityContextHolderFilter@4355a431, org.springframework.security.web.header.HeaderWriterFilter@bed1ad9, org.springframework.web.filter.CorsFilter@36ca8f56, org.springframework.security.web.authentication.logout.LogoutFilter@2ba4e0e6, org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter@3f9b2af6, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@709554a, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6451aca0, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@5060cfe3, org.springframework.security.web.session.SessionManagementFilter@79bb0eb8, org.springframework.security.web.access.ExceptionTranslationFilter@5b93e170, org.springframework.security.web.access.intercept.AuthorizationFilter@f97c708]
+2024-09-08T21:32:42.647Z  INFO 10924 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2024-09-08T21:32:42.681Z  INFO 10924 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8000 (http) with context path ''
+2024-09-08T21:32:42.694Z  INFO 10924 --- [restartedMain] c.m.t.TransactionguardApplication        : Started TransactionguardApplication in 1.557 seconds (process running for 3157.459)
+2024-09-08T21:32:42.756Z  INFO 10924 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
