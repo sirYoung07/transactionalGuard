@@ -1,6 +1,7 @@
 package com.market.transactionguard.services.implementation;
 
 import com.market.transactionguard.dto.request.TransactionRequest;
+import com.market.transactionguard.dto.response.TransactionResponse;
 import com.market.transactionguard.entities.Product;
 import com.market.transactionguard.entities.Transaction;
 import com.market.transactionguard.entities.TransactionStatus;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Transactional
@@ -74,6 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
         return  ResponseEntity.ok("Transaction has been successfully initialized");
     }
 
+
     private Transaction getTransaction(TransactionRequest transactionRequest, StringBuilder imageLinks) {
         Optional<User> authenticatedUser = accountUtil.getAuthenticatedUser();
 
@@ -98,4 +101,42 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setUser(authenticatedUser.get());
         return transaction;
     }
+
+
+    @Override
+    public ResponseEntity<TransactionResponse> getTransactionById(Long transactionId) {
+        if(accountUtil.getAuthenticatedUser().isEmpty()){
+            return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TransactionResponse("User not authenticated"));
+        }
+
+        Optional<Transaction> transactionOptional =  transactionRepository.findById(transactionId);
+
+        if (transactionOptional.isEmpty()){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(new TransactionResponse("Transaction not found"));
+        }
+
+        if(!Objects.equals(transactionOptional.get().getUser().getId(), accountUtil.getAuthenticatedUser().get().getId())){
+            return  ResponseEntity.status(HttpStatus.FORBIDDEN).body(new TransactionResponse("Access denied"));
+        }
+
+        TransactionResponse response = new TransactionResponse(
+            "success",
+            transactionOptional.get().getAmount(),
+            transactionOptional.get().getRecipientEmailAddress(),
+            transactionOptional.get().getRecipientPhoneNumber(),
+            transactionOptional.get().getRecipientName(),
+            transactionOptional.get().getTransactionStatus(),
+            transactionOptional.get().getProduct()
+        );
+
+        return  ResponseEntity.ok(response);
+
+
+
+    }
+
+
+
+
+
 }

@@ -2,15 +2,14 @@ package com.market.transactionguard.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.market.transactionguard.dto.request.TransactionRequest;
+import com.market.transactionguard.dto.response.TransactionResponse;
 import com.market.transactionguard.services.TransactionService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.rmi.MarshalException;
 import java.util.List;
 
 @RestController
@@ -31,6 +30,13 @@ public class TransactionController {
         return transactionService.createATransaction(transactionRequest1,productImages);
 
     }
+
+    @GetMapping(path = "/{transactionId}")
+    public ResponseEntity<TransactionResponse> getTransactionById(@PathVariable Long transactionId) {
+        return transactionService.getTransactionById(transactionId);
+    }
+
+
 
 
 }

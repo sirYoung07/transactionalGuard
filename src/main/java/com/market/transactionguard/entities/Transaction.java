@@ -49,7 +49,4 @@ public class Transaction {
         this.transactionStatus = transactionStatus;
     }
 
-
-
-
 }
