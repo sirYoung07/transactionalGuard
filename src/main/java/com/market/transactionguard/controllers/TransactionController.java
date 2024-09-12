@@ -2,6 +2,7 @@ package com.market.transactionguard.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.market.transactionguard.dto.request.TransactionRequest;
+import com.market.transactionguard.dto.response.PaymentInitializationResponse;
 import com.market.transactionguard.dto.response.TransactionResponse;
 import com.market.transactionguard.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,17 @@ public class TransactionController {
     @GetMapping(path = "/{transactionId}")
     public ResponseEntity<TransactionResponse> getTransactionById(@PathVariable Long transactionId) {
         return transactionService.getTransactionById(transactionId);
+    }
+
+    //INITIALIZE PAYMENT method
+    @PostMapping(path = "/{transactionId}/initialize-payment")
+    public ResponseEntity<PaymentInitializationResponse> initializeTransaction(@PathVariable Long transactionId){
+        return transactionService.initializePayment(transactionId);
+    }
+
+    // TODO :
+    public ResponseEntity<String> confirmATransaction(){
+        return transactionService.confirmATransaction();
     }
 
 

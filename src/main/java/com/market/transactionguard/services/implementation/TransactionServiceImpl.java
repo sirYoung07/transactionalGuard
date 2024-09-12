@@ -1,38 +1,64 @@
 package com.market.transactionguard.services.implementation;
 
+import com.market.transactionguard.dto.request.PaymentInitializationRequest;
 import com.market.transactionguard.dto.request.TransactionRequest;
+import com.market.transactionguard.dto.response.PaymentInitializationResponse;
 import com.market.transactionguard.dto.response.TransactionResponse;
-import com.market.transactionguard.entities.Product;
-import com.market.transactionguard.entities.Transaction;
-import com.market.transactionguard.entities.TransactionStatus;
-import com.market.transactionguard.entities.User;
+import com.market.transactionguard.entities.*;
 import com.market.transactionguard.repositories.TransactionRepository;
 import com.market.transactionguard.services.TransactionService;
 import com.market.transactionguard.utils.AccountUtil;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Transactional
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    @Value("${monnify.uri}")
+    private String baseUri;
+
+    @Getter
+    @Value("${monnify.contractCode}")
+    private String contractCode;
 
     @Autowired
-    private  AccountUtil accountUtil;
+    private final TransactionRepository transactionRepository;
+
+    @Autowired
+    private  final AccountUtil accountUtil;
+
+    private final WebClient webClient;
+
+    private final AccountServiceImpl accountService;
+
+    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountUtil accountUtil, WebClient webClient, AccountServiceImpl accountService) {
+        this.transactionRepository = transactionRepository;
+        this.accountUtil = accountUtil;
+        this.webClient = webClient;
+        this.accountService = accountService;
+    }
 
     @Override
     public ResponseEntity<String> createATransaction(TransactionRequest transactionRequest, List<MultipartFile> productImages) {
@@ -70,10 +96,13 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionRepository.save(transaction);
 
-        // TODO : SEND EMAIL TO THE RECEIVER.
+        String paymentLink = accountUtil.generatePaymentLink() + transaction.getId();
 
 
-        return  ResponseEntity.ok("Transaction has been successfully initialized");
+        // TODO : SEND EMAIL TO THE RECEIVER WITH THE PAYMENT LINK.
+
+
+        return  ResponseEntity.ok("Transaction has been successfully initialized" + " "  + paymentLink);
     }
 
 
@@ -105,6 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public ResponseEntity<TransactionResponse> getTransactionById(Long transactionId) {
+
         if(accountUtil.getAuthenticatedUser().isEmpty()){
             return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TransactionResponse("User not authenticated"));
         }
@@ -131,12 +161,88 @@ public class TransactionServiceImpl implements TransactionService {
 
         return  ResponseEntity.ok(response);
 
+        // TODO: GENERATE A LINK TO REDIRECT RECIPIENT TO THE MAKE PAYMENT
+
 
 
     }
 
 
+    // THIS METHOD IS USED TO INILIAZE A  TRANSACTION
+    @Override
+    public ResponseEntity<PaymentInitializationResponse> initializePayment(Long transactionId) {
 
+        if (accountUtil.getAuthenticatedUser().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PaymentInitializationResponse("User not authenticated"));
+        }
+
+        Optional<Transaction> transactionOptional = transactionRepository.findById(transactionId);
+
+        if (transactionOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PaymentInitializationResponse("Transaction not found"));
+        }
+
+        if (!Objects.equals(transactionOptional.get().getUser().getId(), accountUtil.getAuthenticatedUser().get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new PaymentInitializationResponse("Access denied"));
+        }
+
+        ArrayList<String> paymentMethods = new ArrayList<>();
+        paymentMethods.add("CARD");
+        paymentMethods.add("ACCOUNT_TRANSFER");
+
+        // SET REQUEST TO BE SENT TO MONNIFY
+        PaymentInitializationRequest paymentInitializationRequest = new PaymentInitializationRequest();
+        paymentInitializationRequest.setAmount(transactionOptional.get().getAmount());
+        paymentInitializationRequest.setCustomerName(transactionOptional.get().getRecipientName());
+        paymentInitializationRequest.setCustomerEmail(transactionOptional.get().getRecipientEmailAddress());
+        paymentInitializationRequest.setPaymentDescription("SERVICE PAYMENT");
+        paymentInitializationRequest.setPaymentReference(accountUtil.generatePaymentReference());
+        paymentInitializationRequest.setContractCode(contractCode);
+        paymentInitializationRequest.setCurrencyCode("NGN");
+        paymentInitializationRequest.setPaymentMethods(paymentMethods);
+        paymentInitializationRequest.setRedirectUrl("https://www.google.com");
+
+
+        log.info(String.valueOf(paymentInitializationRequest));
+
+        try {
+
+            PaymentInitializationResponse response = webClient.method(HttpMethod.POST)
+                .uri(baseUri + "/api/v1/merchant/transactions/init-transaction")
+                .header("Authorization", "Bearer " + accountService.getAccessTokenFromMonnify())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(paymentInitializationRequest)
+                .retrieve().bodyToMono(PaymentInitializationResponse.class).block();
+
+            if (response != null && response.isRequestSuccessful()) {
+                return ResponseEntity.ok(response);
+            }else {
+                throw new RuntimeException("Failed to initiate payment: " +
+                    (response != null ? response.getResponseMessage() : "Internal Server error"));
+            }
+
+
+        } catch (WebClientResponseException e) {
+
+            log.error("error while initilizing paymenet a", e);
+
+            return ResponseEntity.status(e.getStatusCode()).body(new PaymentInitializationResponse(e.getStatusCode().toString(), "Failed to initiate payment. Please try again later"));
+        } catch (Exception e) {
+            log.error("Unexpected error while creating a reserved account", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentInitializationResponse("500", "An internal server error occurred"));
+        }
+
+    }
+
+
+
+
+
+
+    @Override
+    public ResponseEntity<String> confirmATransaction() {
+        return null;
+    }
 
 
 }

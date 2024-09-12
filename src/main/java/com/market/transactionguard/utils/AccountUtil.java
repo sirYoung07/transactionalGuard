@@ -31,6 +31,12 @@ public class AccountUtil {
 
     }
 
+    public  String generatePaymentReference(){
+        return  "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0,16);
+    }
+
+
+
     public String generateUniquePaymentReference() {
         return "payment-" + System.currentTimeMillis();
     }
@@ -42,6 +48,12 @@ public class AccountUtil {
         }catch (NullPointerException e){
             return e.getLocalizedMessage();
         }
+
+    }
+
+    public String generatePaymentLink(){
+        // Point to the backend API that will handle Monnify payment initialization
+        return "{/api/transactions/";
 
     }
 
