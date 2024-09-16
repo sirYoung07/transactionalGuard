@@ -3,6 +3,7 @@ package com.market.transactionguard.services.implementation;
 import com.market.transactionguard.dto.request.PaymentInitializationRequest;
 import com.market.transactionguard.dto.request.TransactionRequest;
 import com.market.transactionguard.dto.response.PaymentInitializationResponse;
+import com.market.transactionguard.dto.response.PaymentVerificationResponse;
 import com.market.transactionguard.dto.response.TransactionResponse;
 import com.market.transactionguard.entities.*;
 import com.market.transactionguard.repositories.TransactionRepository;
@@ -37,11 +38,15 @@ import java.util.Optional;
 public class TransactionServiceImpl implements TransactionService {
 
     @Value("${monnify.uri}")
-    private String baseUri;
+    private String monnifyUri;
 
     @Getter
     @Value("${monnify.contractCode}")
     private String contractCode;
+
+    @Getter
+    @Value("${app.base-uri}")
+    private String appUri;
 
     @Autowired
     private final TransactionRepository transactionRepository;
@@ -56,9 +61,10 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionServiceImpl(TransactionRepository transactionRepository, AccountUtil accountUtil, WebClient webClient, AccountServiceImpl accountService) {
         this.transactionRepository = transactionRepository;
         this.accountUtil = accountUtil;
-        this.webClient = webClient;
+        this.webClient = WebClient.builder().baseUrl(monnifyUri).build();
         this.accountService = accountService;
     }
+
 
     @Override
     public ResponseEntity<String> createATransaction(TransactionRequest transactionRequest, List<MultipartFile> productImages) {
@@ -200,7 +206,7 @@ public class TransactionServiceImpl implements TransactionService {
         paymentInitializationRequest.setContractCode(contractCode);
         paymentInitializationRequest.setCurrencyCode("NGN");
         paymentInitializationRequest.setPaymentMethods(paymentMethods);
-        paymentInitializationRequest.setRedirectUrl("https://www.google.com");
+        paymentInitializationRequest.setRedirectUrl(appUri);
 
 
         log.info(String.valueOf(paymentInitializationRequest));
@@ -208,12 +214,11 @@ public class TransactionServiceImpl implements TransactionService {
         try {
 
             PaymentInitializationResponse response = webClient.method(HttpMethod.POST)
-                .uri(baseUri + "/api/v1/merchant/transactions/init-transaction")
+                .uri(monnifyUri + "/api/v1/merchant/transactions/init-transaction")
                 .header("Authorization", "Bearer " + accountService.getAccessTokenFromMonnify())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(paymentInitializationRequest)
                 .retrieve().bodyToMono(PaymentInitializationResponse.class).block();
-
             if (response != null && response.isRequestSuccessful()) {
                 return ResponseEntity.ok(response);
             }else {
@@ -228,20 +233,46 @@ public class TransactionServiceImpl implements TransactionService {
 
             return ResponseEntity.status(e.getStatusCode()).body(new PaymentInitializationResponse(e.getStatusCode().toString(), "Failed to initiate payment. Please try again later"));
         } catch (Exception e) {
-            log.error("Unexpected error while creating a reserved account", e);
+            log.error("Unexpected error while making payment", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentInitializationResponse("500", "An internal server error occurred"));
         }
 
     }
 
-
-
-
-
-
     @Override
-    public ResponseEntity<String> confirmATransaction() {
-        return null;
+    public ResponseEntity<PaymentVerificationResponse> verifyPayment(String paymentReference) {
+
+        try {
+            log.info("using monnify url{} ", monnifyUri);
+
+            PaymentVerificationResponse response = webClient.method(HttpMethod.GET)
+                .uri(uriBuilder -> uriBuilder
+                    .scheme("https")
+                    .host(monnifyUri.replace("https://", ""))
+                    .path("/api/v2/merchant/transactions/query")
+                    .queryParam("paymentReference", paymentReference)
+                    .build())
+                .header("Authorization", "Bearer " + accountService.getAccessTokenFromMonnify())
+                .retrieve().bodyToMono(PaymentVerificationResponse.class).block();
+
+            if (response != null && response.isRequestSuccessful()) {
+                log.info("Transaction verified successfully" + paymentReference);
+                return ResponseEntity.ok(response);
+            }else {
+                throw new RuntimeException("Failed to get transaction : " +
+                    (response != null ? response.getResponseMessage() : "Internal Server error"));
+            }
+
+
+        } catch (WebClientResponseException e) {
+
+            log.error("error while verifying payment", e);
+
+            return ResponseEntity.status(e.getStatusCode()).body(new PaymentVerificationResponse(e.getStatusCode().toString(), "Failed to get transaction status.  Please try again later"));
+        } catch (Exception e) {
+            log.error("Unexpected error while making payment", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentVerificationResponse("500", "An internal server error occurred"));
+        }
     }
 
 

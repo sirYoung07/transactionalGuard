@@ -3,6 +3,7 @@ package com.market.transactionguard.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.market.transactionguard.dto.request.TransactionRequest;
 import com.market.transactionguard.dto.response.PaymentInitializationResponse;
+import com.market.transactionguard.dto.response.PaymentVerificationResponse;
 import com.market.transactionguard.dto.response.TransactionResponse;
 import com.market.transactionguard.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +44,14 @@ public class TransactionController {
         return transactionService.initializePayment(transactionId);
     }
 
-    // TODO :
-    public ResponseEntity<String> confirmATransaction(){
-        return transactionService.confirmATransaction();
+
+
+    @GetMapping(path = "/verify-payment")
+    public ResponseEntity<PaymentVerificationResponse> verifyPayment(@RequestParam String paymentReference){
+        return transactionService.verifyPayment(paymentReference);
     }
+
+
 
 
 

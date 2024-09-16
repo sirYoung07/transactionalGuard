@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +36,11 @@ public class AccountUtil {
     public  String generatePaymentReference(){
         return  "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0,16);
     }
+
+    public String encodePaymentReference(String paymentReference){
+          return URLEncoder.encode(paymentReference, StandardCharsets.UTF_8);
+    }
+
 
 
 

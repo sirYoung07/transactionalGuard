@@ -27,7 +27,7 @@ spring:
         max-request-size: 200MB
 
 app:
-  base-uri: testdomain.com
+  base-uri: http://localhost:8000
 
 logging:
     file:

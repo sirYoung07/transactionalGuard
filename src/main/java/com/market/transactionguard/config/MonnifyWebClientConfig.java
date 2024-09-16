@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class MonnifyWebClientConfig {
-    private static final String MONNIFY_BASE_URL = "https://api.monnify.com/api/v1";
+    private static final String MONNIFY_BASE_URL = "https://sandbox.monnify.com";
 
     @Bean
     public WebClient monnifyWebClient() {
